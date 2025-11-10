@@ -1,7 +1,11 @@
 /* ====== VERSJON ======
    - Alt lagres kun i minnet, og kan lastes ned som JSON/CSV
    - Utvidet med ekstra ting som kan måles
+   - Nå: samler begge runder før resultat/eksport vises
 ==================================== */
+
+// Hvor mange runder hver deltaker skal gjennomføre før eksport vises
+const TOTAL_RUNS = 2;
 
 /* ====== HJELPEFUNKSJONER ====== */
 const $ = (sel) => document.querySelector(sel);
@@ -55,7 +59,6 @@ const log = {
   fieldStats: {
     // [fieldId]: { focusCount, totalFocusTimeMs, blurCount, corrections }
   },
-
 
   events: []
 };
@@ -318,75 +321,134 @@ function setServerStatus(text, level = 'info') {
   el.classList.add('status', level);
 }
 
+/* ====== HJELP: LAGRE / HENTE FLERE RUNS I sessionStorage ====== */
+function getAllRunsFromStorage() {
+  try {
+    const raw = sessionStorage.getItem('allRuns');
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed;
+    return [];
+  } catch {
+    return [];
+  }
+}
+
+function saveAllRunsToStorage(runs) {
+  try {
+    sessionStorage.setItem('allRuns', JSON.stringify(runs));
+  } catch {
+    // ignorer
+  }
+}
+
 /* ====== RESULTATVISNING & EKSPORT ====== */
-function renderResults() {
+/**
+ * allRuns: array av log-objekter (en per runde)
+ * Viser kun når begge runder er gjort.
+ */
+function renderResults(allRuns) {
+  if (!Array.isArray(allRuns) || allRuns.length === 0) return;
+
   const exportArea = $('#exportArea');
   if (exportArea) exportArea.style.display = 'block';
 
+  // Aggreger enkel statistikk på tvers av runder
+  const totals = allRuns.reduce(
+    (acc, run) => {
+      acc.msElapsed += run.msElapsed || 0;
+      acc.mouseClicks += run.mouseClicks || 0;
+      acc.touchTaps += run.touchTaps || 0;
+      acc.keyPresses += run.keyPresses || 0;
+      acc.backspaces += run.backspaces || 0;
+      acc.scrollEvents += run.scrollEvents || 0;
+      acc.maxScrollY = Math.max(acc.maxScrollY, run.maxScrollY || 0);
+      acc.validationErrors += run.validationErrors || 0;
+      acc.failedSubmissions += run.failedSubmissions || 0;
+      return acc;
+    },
+    {
+      msElapsed: 0,
+      mouseClicks: 0,
+      touchTaps: 0,
+      keyPresses: 0,
+      backspaces: 0,
+      scrollEvents: 0,
+      maxScrollY: 0,
+      validationErrors: 0,
+      failedSubmissions: 0
+    }
+  );
 
-  const secs = (log.msElapsed / 1000).toFixed(2);
+  const secs = (totals.msElapsed / 1000).toFixed(2);
   $('#timeTaken') && ($('#timeTaken').textContent = secs);
-  $('#mouseClicks') && ($('#mouseClicks').textContent = String(log.mouseClicks));
-  $('#touchTaps') && ($('#touchTaps').textContent = String(log.touchTaps));
-  $('#keyPresses') && ($('#keyPresses').textContent = String(log.keyPresses));
-  $('#backspaces') && ($('#backspaces').textContent = String(log.backspaces));
+  $('#mouseClicks') && ($('#mouseClicks').textContent = String(totals.mouseClicks));
+  $('#touchTaps') && ($('#touchTaps').textContent = String(totals.touchTaps));
+  $('#keyPresses') && ($('#keyPresses').textContent = String(totals.keyPresses));
+  $('#backspaces') && ($('#backspaces').textContent = String(totals.backspaces));
   $('#validationErrors') &&
-    ($('#validationErrors').textContent = String(log.validationErrors));
+    ($('#validationErrors').textContent = String(totals.validationErrors));
   $('#failedSubmissions') &&
-    ($('#failedSubmissions').textContent = String(log.failedSubmissions));
+    ($('#failedSubmissions').textContent = String(totals.failedSubmissions));
 
   const dlJson = $('#downloadJson');
   const dlCsv = $('#downloadCsv');
 
   if (dlJson) {
     dlJson.onclick = () => {
-      downloadFile('log.json', JSON.stringify(log, null, 2), 'application/json');
+      // Last ned ALLE runder som én fil (array av log-objekter)
+      downloadFile('logs_all_runs.json', JSON.stringify(allRuns, null, 2), 'application/json');
     };
   }
+
   if (dlCsv) {
     dlCsv.onclick = () => {
-      const rows = [
-        [
-          'participantId',
-          'uiVersion',
-          'runNumber',
-          'pageLoadedAt',
-          'startedAt',
-          'endedAt',
-          'msElapsed',
-          'timeToFirstInteractionMs',
-          'mouseClicks',
-          'touchTaps',
-          'keyPresses',
-          'backspaces',
-          'scrollEvents',
-          'maxScrollY',
-          'validationErrors',
-          'failedSubmissions',
-          'taskSuccess'
-        ],
-        [
-          log.participantId ?? '',
-          log.uiVersion ?? '',
-          log.runNumber ?? '',
-          log.pageLoadedAt ?? '',
-          log.startedAt ?? '',
-          log.endedAt ?? '',
-          log.msElapsed,
-          log.timeToFirstInteractionMs ?? '',
-          log.mouseClicks,
-          log.touchTaps,
-          log.keyPresses,
-          log.backspaces,
-          log.scrollEvents,
-          log.maxScrollY,
-          log.validationErrors,
-          log.failedSubmissions,
-          log.taskSuccess ? 1 : 0
-        ]
+      const header = [
+        'participantId',
+        'uiVersion',
+        'runNumber',
+        'pageLoadedAt',
+        'startedAt',
+        'endedAt',
+        'msElapsed',
+        'timeToFirstInteractionMs',
+        'mouseClicks',
+        'touchTaps',
+        'keyPresses',
+        'backspaces',
+        'scrollEvents',
+        'maxScrollY',
+        'validationErrors',
+        'failedSubmissions',
+        'taskSuccess'
       ];
+
+      const rows = [header];
+
+      allRuns.forEach((run) => {
+        rows.push([
+          run.participantId ?? '',
+          run.uiVersion ?? '',
+          run.runNumber ?? '',
+          run.pageLoadedAt ?? '',
+          run.startedAt ?? '',
+          run.endedAt ?? '',
+          run.msElapsed ?? '',
+          run.timeToFirstInteractionMs ?? '',
+          run.mouseClicks ?? '',
+          run.touchTaps ?? '',
+          run.keyPresses ?? '',
+          run.backspaces ?? '',
+          run.scrollEvents ?? '',
+          run.maxScrollY ?? '',
+          run.validationErrors ?? '',
+          run.failedSubmissions ?? '',
+          run.taskSuccess ? 1 : 0
+        ]);
+      });
+
       downloadFile(
-        'log.csv',
+        'logs_all_runs.csv',
         rows.map((r) => r.map(escapeCsv).join(',')).join('\n'),
         'text/csv'
       );
@@ -402,6 +464,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   log.pageLoadedAt = nowISO();
 
+  // Sørg for at eksport-området er skjult ved start
+  const exportArea = $('#exportArea');
+  if (exportArea) exportArea.style.display = 'none';
+
   if (!form) {
     console.warn('Fant ikke #testForm i DOM-en. Sjekk at ID stemmer.');
     return;
@@ -413,7 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Valideringshendelser (blur)
   form.addEventListener('focusout', handleBlur);
 
-  // Innsending (kun lokal logging + eksport)
+  // Innsending (kun lokal logging + eksport ETTER begge runder)
   form.addEventListener('submit', (e) => {
     startTimerIfNeeded();
 
@@ -443,17 +509,35 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    e.preventDefault(); // ingen navigasjon – kun lokal logging
+    // Ingen navigasjon – kun lokal logging
+    e.preventDefault();
     endTimer();
     log.participantId = (participantInput?.value || '').trim() || null;
     log.taskSuccess = true;
     recordEvent('submit_success', {});
 
-    setServerStatus('Data er klar – last ned med knappene under.', 'ok');
-    renderResults();
+    // Ta et "snapshot" av denne runden og lagre i sessionStorage
+    const runCopy = JSON.parse(JSON.stringify(log));
+    const allRuns = getAllRunsFromStorage();
+    allRuns.push(runCopy);
+    saveAllRunsToStorage(allRuns);
 
-    const nextUi =
-        log.uiVersion === 'one_page' ? 'step_by_step' : 'one_page';
+    const completedRuns = allRuns.length;
+
+    if (completedRuns >= TOTAL_RUNS) {
+      // Nå er begge versjoner gjort – vis eksport og samlet statistikk
+      setServerStatus('Begge runder er fullført – data er klar til nedlasting.', 'ok');
+      renderResults(allRuns);
+    } else {
+      // Første runde er ferdig, men ikke vis eksport ennå
+      setServerStatus(
+        'Første runde er lagret. Du vil få nedlastingsknapper når begge versjoner er gjennomført.',
+        'info'
+      );
+    }
+
+    // Sett opp neste UI-versjon (for neste sidevisning)
+    const nextUi = log.uiVersion === 'one_page' ? 'step_by_step' : 'one_page';
     sessionStorage.setItem('nextUiVersion', nextUi);
 
     const currentRun = Number(sessionStorage.getItem('runNumber') || '1');
@@ -462,20 +546,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const backBtn = document.getElementById('backToStartBtn');
     if (backBtn) {
-        backBtn.style.display = 'inline-block';
-        backBtn.onclick = () => {
+      backBtn.style.display = 'inline-block';
+      backBtn.onclick = () => {
         window.location.href = 'index.html'; // endre filnavn ved behov
-        };
+      };
     }
   });
 
-  // Reset (ny runde)
+  // Reset (ny runde – hovedsakelig nyttig for testing)
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
       form.reset();
       $$('#testForm [data-field]').forEach((row) => showError(row, false));
 
-      // Nullstill logg, men øk runNumber hvis du vil telle runder
+      // Nullstill logg, men behold eksisterende allRuns i sessionStorage
       const prevRunNumber = log.runNumber || 1;
 
       Object.assign(log, {
@@ -513,8 +597,8 @@ document.addEventListener('DOMContentLoaded', () => {
         delete fieldFocusStartTimes[k];
       }
 
-      const exportArea = $('#exportArea');
-      if (exportArea) exportArea.style.display = 'none';
+      const exportAreaLocal = $('#exportArea');
+      if (exportAreaLocal) exportAreaLocal.style.display = 'none';
       setServerStatus('');
     });
   }
