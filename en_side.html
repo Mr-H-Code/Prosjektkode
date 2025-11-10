@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="utf-8" />
+    <title>Jobbsøknad – Skjema (Én side)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+     rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" 
+     crossorigin="anonymous">
+    <style>
+      body {
+        background-color: #e5e5e5;
+      }
+
+      .app-card {
+        max-width: 800px;
+        margin: 1.5rem auto;
+        background-color: #f8f7f4;
+      }
+
+      .app-card .card-header {
+        border-bottom: none;
+      }
+
+      .app-card .card-body {
+        padding-top: 0.75rem;
+      }
+
+      [data-field].has-error .form-control,
+      [data-field].has-error .form-select {
+        border-color: #c53030;
+      }
+
+      [data-field].has-error .form-check-input {
+        outline: 2px solid #dc3545;
+      }
+
+      .error {
+        display: none;
+        font-size: 0.85rem;
+      }
+
+      .status {
+        margin-top: 0.75rem;
+        font-size: 0.9rem;
+      }
+
+      .status.info {
+        color: #0d6efd;
+      }
+
+      .status.ok {
+        color: #198754;
+      }
+
+      .status.warn {
+        color: #fd7e14;
+      }
+
+      .status.error {
+        color: #dc3545;
+      }
+
+      #exportArea {
+        max-width: 800px;
+        margin: 0 auto 2rem auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card shadow-sm app-card">
+        <div class="card-header bg-white">
+          <h1 class="h4 mb-1">Jobbsøknad – testskjema</h1>
+          <p class="mb-0 text-muted">
+            Fyll ut skjemaet med testdataen du har fått utdelt. Ikke bruk din
+            egen informasjon.
+          </p>
+        </div>
+
+        <div class="card-body">
+          <!-- Deltaker-ID (for logg) -->
+          <div class="mb-3" data-field>
+            <label for="participantId" class="form-label">Deltaker-ID</label>
+            <input
+              type="text"
+              class="form-control"
+              id="participantId"
+              name="participantId"
+              placeholder="f.eks. P01"
+            />
+            <div class="form-text">
+              Bruk ID-en du har fått av testleder. (Valgfritt, men nyttig for analysen.)
+            </div>
+            <div class="error text-danger">
+              Vennligst fyll inn deltaker-ID.
+            </div>
+          </div>
+
+          <hr class="mb-4" />
+
+          <form id="testForm" novalidate data-ui-version="one_page">
+            <!-- PERSONLIGE OPPLYSNINGER -->
+            <h2 class="h5 mb-3">Personlige opplysninger</h2>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3" data-field>
+                  <label for="fullName" class="form-label">Fullt navn</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="fullName"
+                    name="fullName"
+                    required
+                  />
+                  <div class="error text-danger">
+                    Vennligst fyll inn fullt navn.
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3" data-field>
+                  <label for="email" class="form-label">E-postadresse</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    name="email"
+                    required
+                  />
+                  <div class="error text-danger">
+                    Vennligst fyll inn en gyldig e-postadresse.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3" data-field>
+                  <label for="phone" class="form-label">Telefonnummer</label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    id="phone"
+                    name="phone"
+                    pattern="[0-9 ]{8,15}"
+                    required
+                  />
+                  <div class="form-text">
+                    Bruk kun tall og eventuelt mellomrom (8–15 tegn).
+                  </div>
+                  <div class="error text-danger">
+                    Vennligst fyll inn et gyldig telefonnummer.
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3" data-field>
+                  <label for="birthdate" class="form-label">Fødselsdato</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="birthdate"
+                    name="birthdate"
+                    required
+                  />
+                  <div class="error text-danger">
+                    Vennligst velg fødselsdato.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3" data-field>
+              <label for="address" class="form-label">Adresse</label>
+              <input
+                type="text"
+                class="form-control"
+                id="address"
+                name="address"
+                required
+              />
+              <div class="error text-danger">
+                Vennligst fyll inn adresse.
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-6 col-md-4">
+                <div class="mb-3" data-field>
+                  <label for="postalCode" class="form-label">Postnummer</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="postalCode"
+                    name="postalCode"
+                    pattern="[0-9]{4}"
+                    required
+                  />
+                  <div class="form-text">4 siffer.</div>
+                  <div class="error text-danger">
+                    Vennligst fyll inn et gyldig postnummer (4 siffer).
+                  </div>
+                </div>
+              </div>
+              <div class="col-6 col-md-8">
+                <div class="mb-3" data-field>
+                  <label for="city" class="form-label">Sted</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="city"
+                    name="city"
+                    required
+                  />
+                  <div class="error text-danger">
+                    Vennligst fyll inn sted.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- STILLING OG ARBEIDSFORHOLD -->
+            <h2 class="h5 mb-3">Stilling og arbeidsforhold</h2>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3" data-field>
+                  <label for="position" class="form-label">Ønsket stilling</label>
+                  <select
+                    id="position"
+                    name="position"
+                    class="form-select"
+                    required
+                  >
+                    <option value="">Velg stilling…</option>
+                    <option value="kundebehandler">Kundebehandler</option>
+                    <option value="utvikler">Utvikler</option>
+                    <option value="designer">Designer</option>
+                    <option value="drift">Driftsmedarbeider</option>
+                    <option value="annet">Annet</option>
+                  </select>
+                  <div class="error text-danger">
+                    Vennligst velg ønsket stilling.
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3" data-field>
+                  <label for="startDate" class="form-label">Tidligste startdato</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="startDate"
+                    name="startDate"
+                    required
+                  />
+                  <div class="error text-danger">
+                    Vennligst velg startdato.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3" data-field>
+              <span class="form-label d-block mb-1">Ønsket ansettelsesform</span>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="employmentType"
+                  id="employmentFull"
+                  value="heltid"
+                  required
+                />
+                <label class="form-check-label" for="employmentFull">
+                  Heltid
+                </label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="employmentType"
+                  id="employmentPart"
+                  value="deltid"
+                  required
+                />
+                <label class="form-check-label" for="employmentPart">
+                  Deltid
+                </label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="employmentType"
+                  id="employmentTemp"
+                  value="midlertidig"
+                  required
+                />
+                <label class="form-check-label" for="employmentTemp">
+                  Midlertidig
+                </label>
+              </div>
+              <div class="error text-danger">
+                Vennligst velg ønsket ansettelsesform.
+              </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- UTDANNING OG ERFARING -->
+            <h2 class="h5 mb-3">Utdanning og erfaring</h2>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3" data-field>
+                  <label for="educationLevel" class="form-label">Høyeste utdanning</label>
+                  <select
+                    id="educationLevel"
+                    name="educationLevel"
+                    class="form-select"
+                    required
+                  >
+                    <option value="">Velg nivå…</option>
+                    <option value="grunnskole">Grunnskole</option>
+                    <option value="videregaende">Videregående</option>
+                    <option value="fagskole">Fagskole</option>
+                    <option value="bachelor">Bachelor</option>
+                    <option value="master">Master</option>
+                    <option value="phd">PhD</option>
+                  </select>
+                  <div class="error text-danger">
+                    Vennligst velg utdanningsnivå.
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3" data-field>
+                  <label for="fieldOfStudy" class="form-label">Studieretning / fagfelt</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="fieldOfStudy"
+                    name="fieldOfStudy"
+                    required
+                  />
+                  <div class="error text-danger">
+                    Vennligst fyll inn studieretning/fagfelt.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3" data-field>
+                  <label for="yearsExperience" class="form-label">
+                    Antall års relevant erfaring
+                  </label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="yearsExperience"
+                    name="yearsExperience"
+                    min="0"
+                    max="50"
+                    required
+                  />
+                  <div class="error text-danger">
+                    Vennligst oppgi antall års erfaring (0–50).
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3" data-field>
+                  <label for="lastEmployer" class="form-label">Siste arbeidsgiver</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="lastEmployer"
+                    name="lastEmployer"
+                    required
+                  />
+                  <div class="error text-danger">
+                    Vennligst fyll inn siste arbeidsgiver.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3" data-field>
+              <label for="lastJobTitle" class="form-label">Siste stillingstittel</label>
+              <input
+                type="text"
+                class="form-control"
+                id="lastJobTitle"
+                name="lastJobTitle"
+                required
+              />
+              <div class="error text-danger">
+                Vennligst fyll inn siste stillingstittel.
+              </div>
+            </div>
+
+            <div class="mb-3" data-field>
+              <label for="tasksDesc" class="form-label">
+                Kort beskrivelse av arbeidsoppgaver i siste stilling
+              </label>
+              <textarea
+                class="form-control"
+                id="tasksDesc"
+                name="tasksDesc"
+                rows="3"
+                required
+              ></textarea>
+              <div class="error text-danger">
+                Vennligst skriv en kort beskrivelse.
+              </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- KOMPETANSE OG SPRÅK -->
+            <h2 class="h5 mb-3">Kompetanse og språk</h2>
+
+            <div class="mb-3" data-field>
+              <span class="form-label d-block mb-1">Nøkkelkompetanse (velg minst én)</span>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="skills"
+                  id="skillTeam"
+                  value="teamarbeid"
+                  required
+                />
+                <label class="form-check-label" for="skillTeam">
+                  Teamarbeid
+                </label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="skills"
+                  id="skillCustomer"
+                  value="kundeservice"
+                  required
+                />
+                <label class="form-check-label" for="skillCustomer">
+                  Kundeservice
+                </label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="skills"
+                  id="skillIt"
+                  value="it-kompetanse"
+                  required
+                />
+                <label class="form-check-label" for="skillIt">
+                  IT-kompetanse
+                </label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="skills"
+                  id="skillComm"
+                  value="kommunikasjon"
+                  required
+                />
+                <label class="form-check-label" for="skillComm">
+                  Kommunikasjon
+                </label>
+              </div>
+              <div class="error text-danger">
+                Vennligst velg minst én kompetanse.
+              </div>
+            </div>
+
+            <div class="mb-3" data-field>
+              <label for="languages" class="form-label">
+                Språkferdigheter (f.eks. Norsk – flytende, Engelsk – god)
+              </label>
+              <textarea
+                class="form-control"
+                id="languages"
+                name="languages"
+                rows="2"
+                required
+              ></textarea>
+              <div class="error text-danger">
+                Vennligst oppgi språkferdigheter.
+              </div>
+            </div>
+
+            <div class="mb-3" data-field>
+              <label for="howHeard" class="form-label">Hvordan fikk du vite om stillingen?</label>
+              <select
+                id="howHeard"
+                name="howHeard"
+                class="form-select"
+                required
+              >
+                <option value="">Velg alternativ…</option>
+                <option value="annonse">Annonse på nett</option>
+                <option value="firmaweb">Firmaets nettside</option>
+                <option value="venn">Tips fra venn/kollega</option>
+                <option value="sosiale_medier">Sosiale medier</option>
+                <option value="annet">Annet</option>
+              </select>
+              <div class="error text-danger">
+                Vennligst velg et alternativ.
+              </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- MOTIVASJON OG SAMTYKKE -->
+            <h2 class="h5 mb-3">Motivasjon</h2>
+
+            <div class="mb-3" data-field>
+              <label for="motivation" class="form-label">
+                Hvorfor ønsker du denne stillingen? (kort motivasjonstekst)
+              </label>
+              <textarea
+                class="form-control"
+                id="motivation"
+                name="motivation"
+                rows="4"
+                minlength="30"
+                required
+              ></textarea>
+              <div class="form-text">
+                Skriv minst én til to setninger (minst ca. 30 tegn).
+              </div>
+              <div class="error text-danger">
+                Vennligst skriv en kort motivasjonstekst.
+              </div>
+            </div>
+
+            <div class="mb-3" data-field>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="consent"
+                  name="consent"
+                  required
+                />
+                <label class="form-check-label" for="consent">
+                  Jeg bekrefter at opplysningene jeg har gitt er korrekte, og
+                  at dette kun er et testskjema.
+                </label>
+              </div>
+              <div class="error text-danger">
+                Du må bekrefte før du kan sende inn.
+              </div>
+            </div>
+
+            <!-- KNAPPER OG STATUS -->
+            <div class="d-flex flex-column flex-sm-row gap-2 align-items-sm-center mt-4">
+              <button type="submit" class="btn btn-primary">
+                Send inn skjema
+              </button>
+              <button
+                type="button"
+                id="resetBtn"
+                class="btn btn-outline-secondary"
+              >
+                Nullstill skjema
+              </button>
+            </div>
+
+            <div id="serverStatus" class="status info"></div>
+          </form>
+        </div>
+      </div>
+
+      <!-- RESULTATER / EKSPORT -->
+      <div id="exportArea" class="card shadow-sm mb-4" style="display: none">
+        <div class="card-body">
+          <h2 class="h5 mb-3">Målinger for denne gjennomføringen</h2>
+
+          <div class="row gy-2">
+            <div class="col-6 col-md-4">
+              <div class="small text-muted">Tid brukt (sekunder)</div>
+              <div class="fw-semibold" id="timeTaken">–</div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="small text-muted">Museklikk</div>
+              <div class="fw-semibold" id="mouseClicks">–</div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="small text-muted">Berøringer (touch)</div>
+              <div class="fw-semibold" id="touchTaps">–</div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="small text-muted">Tastetrykk</div>
+              <div class="fw-semibold" id="keyPresses">–</div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="small text-muted">Tilbakeslettinger</div>
+              <div class="fw-semibold" id="backspaces">–</div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="small text-muted">Valideringsfeil</div>
+              <div class="fw-semibold" id="validationErrors">–</div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="small text-muted">Blokkerte innsendinger</div>
+              <div class="fw-semibold" id="failedSubmissions">–</div>
+            </div>
+          </div>
+
+          <hr />
+
+          <div class="d-flex flex-wrap gap-2">
+            <button id="downloadJson" class="btn btn-outline-primary btn-sm" type="button">
+              Last ned logg (JSON)
+            </button>
+            <button id="downloadCsv" class="btn btn-outline-secondary btn-sm" type="button">
+              Last ned sammendrag (CSV)
+            </button>
+          </div>
+          <button
+            id="backToStartBtn"
+            class="btn btn-outline-secondary btn-sm"
+            type="button"
+            style="display: none;"
+            >
+            Tilbake til startside
+            </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS (valgfritt, kun for evt. komponenter) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+    crossorigin="anonymous">
+    </script>
+
+    <!-- Din logger -->
+    <script src="script.js"></script>
+  </body>
+</html>

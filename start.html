@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="utf-8" />
+    <title>Jobbsøknad – Start</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+
+    <style>
+      body {
+        background-color: #e5e5e5;
+      }
+
+      .start-card {
+        max-width: 600px;
+        margin: 2.5rem auto;
+        background-color: #f8f7f4;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card shadow-sm start-card">
+        <div class="card-body">
+          <h1 class="h4 mb-3">Jobbsøknad – brukertest</h1>
+          <p class="mb-3">
+            Du skal fylle ut et jobbsøknadsskjema med testdata (ikke din egen
+            informasjon). Testleder gir deg instrukser.
+          </p>
+
+          <p class="mb-2 small text-muted" id="nextUiInfo">
+            ...
+          </p>
+
+          <button id="startTestBtn" class="btn btn-primary">
+            Begynn test
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const startBtn = document.getElementById("startTestBtn");
+        const info = document.getElementById("nextUiInfo");
+
+        // Hvis det ikke finnes noe lagret, antar vi at første runde er one_page
+        const nextUi =
+          sessionStorage.getItem("nextUiVersion") || "one_page";
+
+        if (info) {
+          info.textContent =
+            nextUi === "one_page"
+              ? "Neste runde: Skjema på én side (versjon A)."
+              : "Neste runde: Skjema steg for steg (versjon B).";
+        }
+
+        startBtn.addEventListener("click", () => {
+          const ui =
+            sessionStorage.getItem("nextUiVersion") || "one_page";
+
+          // Bytt URL-er til det du faktisk bruker
+          const target =
+            ui === "step_by_step"
+              ? "steg_for_steg.html"
+              : "en_side.html";
+
+          // Hvis du vil nullstille scroll, etc.
+          window.location.href = target;
+        });
+      });
+    </script>
+  </body>
+</html>
