@@ -464,9 +464,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   log.pageLoadedAt = nowISO();
 
-  // Sørg for at eksport-området er skjult ved start
   const exportArea = $('#exportArea');
-  if (exportArea) exportArea.style.display = 'none';
+
+  // Se om vi allerede har fullført begge runder tidligere i denne fanen
+  const existingRuns = getAllRunsFromStorage();
+  if (existingRuns.length >= TOTAL_RUNS) {
+    // Alle runder er allerede gjort – vis eksport og samlet statistikk
+    if (exportArea) exportArea.style.display = 'block';
+    setServerStatus('Begge runder er fullført – data er klar til nedlasting.', 'ok');
+    renderResults(existingRuns);
+  } else {
+    // Ikke ferdig – sørg for at eksportområdet er skjult
+    if (exportArea) exportArea.style.display = 'none';
+  }
 
   if (!form) {
     console.warn('Fant ikke #testForm i DOM-en. Sjekk at ID stemmer.');
@@ -530,10 +540,19 @@ document.addEventListener('DOMContentLoaded', () => {
       renderResults(allRuns);
     } else {
       // Første runde er ferdig, men ikke vis eksport ennå
+      if (exportArea) exportArea.style.display = 'none';
       setServerStatus(
         'Første runde er lagret. Du vil få nedlastingsknapper når begge versjoner er gjennomført.',
         'info'
       );
+      // Tøm eventuell statistikk i UI (i tilfelle noe står der fra tidligere testing)
+      $('#timeTaken') && ($('#timeTaken').textContent = '');
+      $('#mouseClicks') && ($('#mouseClicks').textContent = '');
+      $('#touchTaps') && ($('#touchTaps').textContent = '');
+      $('#keyPresses') && ($('#keyPresses').textContent = '');
+      $('#backspaces') && ($('#backspaces').textContent = '');
+      $('#validationErrors') && ($('#validationErrors').textContent = '');
+      $('#failedSubmissions') && ($('#failedSubmissions').textContent = '');
     }
 
     // Sett opp neste UI-versjon (for neste sidevisning)
