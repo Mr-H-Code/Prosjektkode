@@ -464,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (backBtn) {
         backBtn.style.display = 'inline-block';
         backBtn.onclick = () => {
-        window.location.href = 'start.html'; // endre filnavn ved behov
+        window.location.href = 'index.html'; // endre filnavn ved behov
         };
     }
   });
